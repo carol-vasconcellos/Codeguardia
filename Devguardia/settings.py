@@ -225,5 +225,6 @@ EMAIL_TIMEOUT = 10    # Define um timeout de 10 segundos para a conexão SMTP
 # 🌟 DÁ 3 DIAS PARA O LINK EXPIRAR (o padrão é 1 dia, mas confirme)
 PASSWORD_RESET_TIMEOUT_DAYS = 1
 
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'no-reply@codeguardia.com')
