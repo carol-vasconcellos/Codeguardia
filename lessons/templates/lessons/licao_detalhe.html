@@ -42,9 +42,9 @@
                 <p class="text-lg font-light italic text-orange-400 mb-4">
                     <span class="font-bold not-italic">🎯 Objetivo:</span> {{ licao.conselho }}
                 </p>
-                <div class="video-container">
-                    <iframe src="{{ licao.url_video }}" frameborder="0" allowfullscreen></iframe>
-                </div>
+            <div class="video-container">
+                <iframe src="{{ licao.get_embed_url }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
             </div>
             {% if not sucesso %}
                 <form method="post">
