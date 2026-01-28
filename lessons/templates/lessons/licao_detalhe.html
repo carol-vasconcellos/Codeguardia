@@ -3,278 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ licao.titulo }} | Detalhe</title>
-    <!-- Carrega o Tailwind CSS para design moderno e responsivo -->
+    <title>{{ licao.titulo }} | CodeGuardia</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Define a fonte Inter como padrão */
-        body {
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-        }
-        /* Torna o iframe do vídeo responsivo */
+        body { font-family: 'Inter', sans-serif; min-height: 100vh; }
         .video-container {
-            position: relative;
-            width: 100%;
-            padding-bottom: 56.25%; /* 16:9 aspect ratio */
-            height: 0;
-            overflow: hidden;
-            border-radius: 0.75rem; /* rounded-xl */
+            position: relative; width: 100%; padding-bottom: 56.25%; height: 0;
+            overflow: hidden; border-radius: 0.75rem;
         }
         .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         }
     </style>
 </head>
-<!-- Corpo Principal: Fundo quase preto (900) e texto suave (100) -->
 <body class="bg-gray-900 text-gray-100 p-4 sm:p-8">
 
-    <!-- Container centralizado e responsivo -->
     <div class="max-w-4xl mx-auto">
-        
-        <!-- Link Voltar -->
         <a href="{% url 'lessons:lista_licoes' %}" class="flex items-center text-gray-400 hover:text-orange-500 transition duration-300 mb-6 group">
-            <svg class="w-5 h-5 mr-2 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            <svg class="w-5 h-5 mr-2 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             Voltar para a lista
         </a>
 
-        <!-- Título Principal -->
         <h1 class="text-4xl font-extrabold text-white mb-6 border-b border-orange-600/50 pb-2">{{ licao.titulo }}</h1>
-        
-        <!-- Feedback de Sucesso - Destaque em verde neon no fundo escuro -->
-        {% if sucesso %}
-            <div class="bg-green-900/50 border border-green-600 rounded-xl p-4 mb-8 shadow-2xl shadow-green-900/40">
-                <h3 class="text-xl font-semibold text-green-400 flex items-center">
-                    <span class="mr-2 text-2xl">🚀</span> {{ licao.titulo }} CONCLUÍDA!
-                </h3>
-                
-                <div class="mt-4 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-                    <!-- Botão Refazer -->
-                    <a href="{% url 'lessons:refazer_licao' slug=slug %}">
-                        <button class="w-full sm:w-auto px-6 py-3 text-sm font-medium text-orange-400 border border-orange-600 rounded-lg hover:bg-orange-900/50 transition duration-300">
-                            Refazer Lição
-                        </button>
-                    </a>
 
-                    <!-- Botão Próxima Lição (somente se houver próxima) -->
-                    {% if proximo_slug %}
-                        <a href="{% url 'lessons:licao_detalhe' slug=proximo_slug %}">
-                            <button class="w-full sm:w-auto px-6 py-3 text-lg font-bold bg-orange-600 text-white rounded-lg shadow-lg shadow-orange-600/40 hover:bg-orange-500 transition duration-300 transform hover:scale-[1.02]">
-                                Próxima Lição →
-                            </button>
-                        </a>
-                    {% endif %}
-                </div>
+        {% if sucesso %}
+            <div class="bg-green-900/50 border border-green-600 rounded-xl p-4 mb-8 shadow-2xl">
+                <h3 class="text-xl font-semibold text-green-400 flex items-center">
+                    <span class="mr-2 text-2xl">🚀</span> LIÇÃO CONCLUÍDA!
+                </h3>
             </div>
         {% endif %}
-        
-        <!-- Seção de Conteúdo da Lição -->
-        
+
         {% if licao.tipo == 'video' %}
-            
             <div class="mb-8 p-6 bg-gray-800 rounded-xl shadow-lg">
                 <p class="text-lg font-light italic text-orange-400 mb-4">
-                    <span class="font-bold not-italic">🎯 Desafio:</span> {{ licao.conselho }}
+                    <span class="font-bold not-italic">🎯 Objetivo:</span> {{ licao.conselho }}
                 </p>
-                
-                <!-- Container Responsivo para o Vídeo -->
                 <div class="video-container">
-                    <iframe 
-                        src="{{ licao.url_video }}" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
-                    </iframe>
+                    <iframe src="{{ licao.url_video }}" frameborder="0" allowfullscreen></iframe>
                 </div>
             </div>
-            
             {% if not sucesso %}
-                <!-- Botão Marcar como Concluída - Destaque forte em verde -->
-                <form method="post" class="mt-8">
+                <form method="post">
                     {% csrf_token %}
-                    <button type="submit" name="marcar_concluida" 
-                        class="w-full px-8 py-4 text-xl font-bold bg-green-600 text-white rounded-lg shadow-xl shadow-green-600/30 hover:bg-green-500 transition duration-300 transform hover:scale-[1.01]">
-                        <span class="mr-2">✅</span> Marcar como concluída
+                    <button type="submit" name="marcar_concluida" class="w-full px-8 py-4 text-xl font-bold bg-green-600 text-white rounded-lg hover:bg-green-500 transition duration-300">
+                        ✅ Marcar como concluída
                     </button>
                 </form>
             {% endif %}
 
         {% elif licao.tipo == 'codigo' %}
-        
             <div class="mb-6 p-6 bg-gray-800 rounded-xl shadow-lg">
                 <p class="text-lg font-light italic text-orange-400 mb-4">
                     <span class="font-bold not-italic">🎯 Desafio:</span> {{ licao.conselho }}
                 </p>
                 
-                {% if not sucesso %}
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        <h2 class="text-2xl font-semibold text-white mb-3">Editor de Código</h2>
-                        <!-- Textarea de Código - Estilo de IDE Dark Mode -->
-                        <textarea 
-                            name="codigo_editor" 
-                            rows="12" 
-                            class="w-full p-4 text-sm font-mono bg-gray-900 text-green-400 border border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none resize-y"
-                        >{{ codigo_usuario }}</textarea>
-                        <br>
-                        
-                        <!-- Botão de Ação - Destaque em laranja -->
-                        <button type="submit" 
-                            class="mt-4 px-6 py-3 font-semibold bg-orange-600 text-white rounded-lg shadow-md shadow-orange-600/30 hover:bg-orange-500 transition duration-300 transform hover:scale-[1.01]">
-                            <span class="mr-1">▶️</span> Rodar Código e Testar
+                <form method="post">
+                    {% csrf_token %}
+                    <h2 class="text-2xl font-semibold text-white mb-3">Editor de Código</h2>
+                    <textarea 
+                        name="codigo_editor" 
+                        rows="10" 
+                        class="w-full p-4 text-sm font-mono bg-gray-900 text-green-400 border border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none resize-y"
+                        {% if sucesso %}readonly{% endif %}
+                    >{{ codigo_usuario }}</textarea>
+                    
+                    {% if not sucesso %}
+                        <button type="submit" class="mt-4 px-6 py-3 font-semibold bg-orange-600 text-white rounded-lg hover:bg-orange-500 transition duration-300">
+                            ▶️ Rodar Código e Testar
                         </button>
-                    </form>
-                {% else %}
-                    <h2 class="text-2xl font-semibold text-white mb-3">Seu Código Concluído</h2>
-                    <p class="text-gray-400 mb-3">Seu código original (salvo como concluído):</p>
-                    <!-- Preformatted Code Block - Estilo de IDE Dark Mode -->
-                    <pre class="p-4 bg-gray-900 text-green-400 border border-gray-700 rounded-lg overflow-x-auto text-sm font-mono">{{ codigo_usuario }}</pre>
-                {% endif %}
+                    {% endif %}
+                </form>
             </div>
-            
-            <!-- Resultado do Console -->
+
             <div class="mt-8">
                 <h2 class="text-2xl font-semibold text-white mb-3 flex items-center">
                     <span class="mr-2 text-orange-500">💻</span> Console Output
                 </h2>
-                <!-- Console Output - Fundo preto puro para simular terminal -->
-                <div id="console-output" class="p-4 bg-black text-gray-200 border border-gray-700 rounded-lg shadow-xl font-mono text-sm overflow-x-auto">
-                    <pre class="whitespace-pre-wrap">{{ output }}</pre>
+                <div class="p-4 bg-black text-gray-200 border border-gray-700 rounded-lg font-mono text-sm min-h-[60px]">
+                    <pre class="whitespace-pre-wrap">{{ output|default:"O resultado aparecerá aqui..." }}</pre>
                 </div>
             </div>
-
         {% endif %}
 
-        <div class="mt-10 pt-6 border-t border-gray-700">
-            <a href="{% url 'lessons:lista_licoes' %}" class="text-gray-400 hover:text-orange-500 transition duration-300">
-                ← Voltar para a lista de lições
-            </a>
+        <div class="mt-12 pt-6 border-t border-gray-700 text-center text-gray-500 text-sm">
+            © 2026 CodeGuardia. Todos os direitos reservados.
         </div>
-        
-    </div> <!-- Fim do Container Principal -->
+    </div>
 
-
-    <!-- Modals (Estilo moderno, alto contraste) -->
-
-    <!-- Modal de Sucesso -->
-    <div id="successModal" class="fixed inset-0 z-50 bg-gray-900/90 flex items-center justify-center transition-opacity duration-300 hidden">
-        <div class="bg-gray-800 p-8 rounded-2xl shadow-2xl border-2 border-green-600/50 text-center max-w-sm w-full animate-pulse-once">
+    <div id="successModal" class="fixed inset-0 z-50 bg-gray-900/90 flex items-center justify-center hidden">
+        <div class="bg-gray-800 p-8 rounded-2xl border-2 border-green-600/50 text-center max-w-sm w-full">
             <div class="text-5xl mb-4">🎉</div>
-            <h2 class="text-3xl font-extrabold text-green-400 mb-2">Lição Concluída!</h2>
-            <p class="text-gray-300 mb-6">Parabéns! Você completou esta etapa com sucesso.</p>
-            
-            <div class="space-y-3">
-                {% if proximo_slug %}
-                    <!-- Botão Próxima Lição - Destaque principal -->
-                    <a href="{% url 'lessons:licao_detalhe' slug=proximo_slug %}" class="block">
-                        <button class="w-full px-6 py-3 font-bold bg-orange-600 text-white rounded-lg shadow-lg hover:bg-orange-500 transition duration-300">
-                            Próxima Lição →
-                        </button>
-                    </a>
-                {% endif %}
-                
-                <!-- Botão Refazer Lição - Secundário -->
-                <a href="{% url 'lessons:refazer_licao' slug=slug %}" class="block">
-                    <button class="w-full px-6 py-3 text-sm font-medium text-gray-300 border border-gray-600 rounded-lg hover:bg-gray-700 transition duration-300">
-                        Refazer Lição
-                    </button>
-                </a>
-            </div>
+            <h2 class="text-3xl font-extrabold text-green-400 mb-2">Excelente!</h2>
+            <p class="text-gray-300 mb-6">Você completou o desafio com sucesso.</p>
+            <a href="{% url 'lessons:lista_licoes' %}" class="block w-full px-6 py-3 bg-orange-600 text-white rounded-lg font-bold">Próxima Lição →</a>
         </div>
     </div>
 
-    <!-- Modal de Erro -->
-    <div id="errorModal" class="fixed inset-0 z-50 bg-gray-900/90 flex items-center justify-center transition-opacity duration-300 hidden">
-        <div class="bg-gray-800 p-8 rounded-2xl shadow-2xl border-2 border-red-600/50 max-w-lg w-full">
-            <h2 class="text-3xl font-extrabold text-red-400 mb-4 flex items-center">
-                <span class="mr-2 text-4xl">🚨</span> Erro no Seu Código
-            </h2>
-            
-            <!-- Dica de Erro (Fundo sutil, texto laranja) -->
-            <div class="p-4 mb-6 bg-red-900/50 border border-red-700 rounded-lg">
-                <p class="font-semibold text-orange-400">Dica Rápida:</p>
-                <p class="text-gray-200 mt-1">{{ dica_erro }}</p>
+    <div id="errorModal" class="fixed inset-0 z-50 bg-gray-900/90 flex items-center justify-center hidden">
+        <div class="bg-gray-800 p-8 rounded-2xl border-2 border-red-600/50 max-w-lg w-full">
+            <h2 class="text-3xl font-extrabold text-red-400 mb-4 flex items-center"><span class="mr-2">🚨</span> Erro detectado</h2>
+            <div class="p-4 mb-6 bg-red-900/50 border border-red-700 rounded-lg text-gray-200">
+                {{ dica_erro }}
             </div>
-
-            <p class="text-gray-300 mb-6">Se a dica não for suficiente, você pode buscar ajuda:</p>
-            
-            <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
-                <!-- Botão Fórum - Destaque em laranja -->
-                <a href="{{ forum_link }}" target="_blank" class="flex-1">
-                    <button class="w-full px-6 py-3 font-semibold bg-orange-600 text-white rounded-lg shadow-md hover:bg-orange-500 transition duration-300">
-                        Postar Pergunta no Fórum
-                    </button>
-                </a>
-                
-                <!-- Botão Voltar - Secundário -->
-                <button onclick="document.getElementById('errorModal').classList.add('hidden')" 
-                    class="flex-1 px-6 py-3 font-medium text-gray-300 border border-gray-600 rounded-lg hover:bg-gray-700 transition duration-300">
-                    Voltar ao Código
-                </button>
-            </div>
+            <button onclick="document.getElementById('errorModal').classList.add('hidden')" class="w-full py-3 text-gray-300 border border-gray-600 rounded-lg hover:bg-gray-700">Tentar Novamente</button>
         </div>
     </div>
-
-    <!-- Linha divisória para o rodapé (FORA do container principal) -->
-    <div class="mt-12 pt-6 border-t border-gray-700 text-center">
-        <p class="text-gray-500 text-sm">© 2025 CodeGuardia. Todos os direitos reservados.</p>
-    </div>
-
 
     <script>
-        // Função simples para simular confetes
+        // Função de Confete
         function launchConfetti() {
-            const colors = ['#f97316', '#fb923c', '#fed7aa', '#4ade80']; // Tons de Laranja e um verde de sucesso
             const container = document.body;
-            
-            for (let i = 0; i < 70; i++) {
+            for (let i = 0; i < 50; i++) {
                 const confetti = document.createElement('div');
-                confetti.classList.add('absolute', 'w-3', 'h-3', 'rounded-full', 'shadow-lg');
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                
-                // Posição aleatória na parte superior da tela
+                confetti.style.position = 'absolute';
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.backgroundColor = ['#f97316', '#4ade80', '#ffffff'][Math.floor(Math.random() * 3)];
                 confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.top = -50 + 'px';
-                confetti.style.opacity = Math.random() + 0.5;
-                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-                
-                // Animação CSS para queda e rotação
-                confetti.style.transition = `top ${1.5 + Math.random()}s ease-in, opacity ${0.8 + Math.random()}s ease-out, transform ${2 + Math.random()}s ease-in-out`;
-                
+                confetti.style.top = '-10px';
+                confetti.style.zIndex = '100';
+                confetti.style.transition = `top ${2 + Math.random()}s linear, opacity 2s`;
                 container.appendChild(confetti);
-
-                setTimeout(() => {
-                    confetti.style.top = '100vh';
-                    confetti.style.opacity = 0;
-                }, 50 + i * 5); // Pequeno delay entre os confetes
-
-                setTimeout(() => {
-                    confetti.remove();
-                }, 3000);
+                setTimeout(() => { confetti.style.top = '100vh'; confetti.style.opacity = '0'; }, 100);
+                setTimeout(() => confetti.remove(), 3000);
             }
         }
 
-        // LÓGICA PRINCIPAL: Exibir o modal com base no feedback do Django
         window.onload = function() {
-            const successModal = document.getElementById('successModal');
-            const errorModal = document.getElementById('errorModal');
-            
-            // Variável de feedback, deve ser fornecida pelo seu backend Django
-            const feedbackType = "{{ feedback_tipo }}";
-            
-            if (feedbackType === 'SUCESSO') {
-                successModal.classList.remove('hidden');
-                launchConfetti(); // Lança os confetes no acerto
-            } else if (feedbackType === 'ERRO_SAIDA' || feedbackType === 'ERRO_CODIGO') {
-                errorModal.classList.remove('hidden');
+            const feedback = "{{ feedback_tipo }}";
+            if (feedback === 'SUCESSO') {
+                document.getElementById('successModal').classList.remove('hidden');
+                launchConfetti();
+            } else if (feedback === 'ERRO_SAIDA' || feedback === 'ERRO_CODIGO') {
+                document.getElementById('errorModal').classList.remove('hidden');
             }
         }
     </script>
-
 </body>
 </html>

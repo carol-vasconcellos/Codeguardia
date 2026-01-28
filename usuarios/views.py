@@ -1,59 +1,52 @@
-# usuarios/views.py
+import sys
+import io
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import Licao
 
-from django.shortcuts import render, redirect 
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm 
-from django.contrib.auth import login
-from .forms import CustomUserCreationForm 
-
-# 🌟 CORREÇÃO: Importa a função de cálculo do app 'lessons' a partir do utils
-from lessons.utils import get_progress_data 
-
-# ----------------------------------------------------------------
-
-@login_required
-def bem_vindo(request):
-    """View do Painel do Aluno, mostra o progresso, lendo do DB."""
+def detalhe_licao(request, slug):
+    # Busca a lição pelo slug (ex: seu-primeiro-codigo)
+    licao = get_object_or_404(Licao, slug=slug)
     
-    # CHAMA A FUNÇÃO QUE LÊ DO BANCO DE DADOS A PARTIR DO UTILS
-    progress_data = get_progress_data(request.user) # Passa o objeto User
-    
-    context = {
-        'nome_usuario': request.user.username,
-        **progress_data, 
-    }
-    return render(request, 'usuarios/bem_vindo.html', context)
+    # Variáveis para o template
+    output = ""
+    sucesso = False
+    codigo_enviado = licao.codigo_padrao or ""
 
-
-def criar_conta(request): 
-    """View de Criação de Novo Usuário (Sign Up).""" 
-    if request.method == 'POST': 
-        # 🌟 USANDO O FORMULÁRIO CUSTOMIZADO 🌟
-        form = CustomUserCreationForm(request.POST) 
-        if form.is_valid(): 
-            user = form.save() 
-            # Loga o usuário automaticamente após o registro 
-            login(request, user)  
-            return redirect('bem_vindo')  
-    else: 
-        # 🌟 USANDO O FORMULÁRIO CUSTOMIZADO 🌟
-        form = CustomUserCreationForm() 
-      
-    return render(request, 'usuarios/criar_conta.html', {'form': form})
-
-def landing_page(request):
-    """View da Página Principal (Landing Page)."""
-    
-    if request.user.is_authenticated:
-        return redirect('bem_vindo') 
+    if request.method == "POST":
+        codigo_enviado = request.POST.get("codigo", "")
         
-    mensagem = "CodeGuardia"
-    botao_url = 'login' 
-    botao_texto = "Comece Agora"
+        # --- LÓGICA DE EXECUÇÃO DO PYTHON ---
+        # 1. Criamos um "buffer" para capturar os prints do aluno
+        buffer_saida = io.StringIO()
+        sys.stdout = buffer_saida  # Redireciona o print para o buffer
 
-    context = {
-        'mensagem': mensagem,
-        'botao_url': botao_url,
-        'botao_texto': botao_texto,
-    }
-    return render(request, 'usuarios/landing.html', context)
+        try:
+            # 2. Executa o código enviado pelo aluno
+            # O dicionário vazio {} serve para isolar o ambiente de execução
+            exec(codigo_enviado, {})
+            
+            # 3. Pega o texto que saiu nos prints e remove espaços extras
+            output = buffer_saida.getvalue().strip()
+        except Exception as e:
+            # Se o código do aluno tiver erro de digitação, mostra o erro no console
+            output = f"Erro no código: {str(e)}"
+        finally:
+            # 4. IMPORTANTE: Volta o console do servidor ao normal
+            sys.stdout = sys.__stdout__
+
+        # --- VALIDAÇÃO ---
+        # Compara o que o aluno imprimiu com o que você cadastrou no Admin
+        if licao.tipo == 'codigo':
+            if output == licao.esperado.strip():
+                sucesso = True
+                messages.success(request, "Parabéns! Você acertou o desafio.")
+            else:
+                messages.error(request, "O código rodou, mas o resultado não é o esperado.")
+
+    return render(request, "lessons/detalhe_licao.html", {
+        "licao": licao,
+        "codigo": codigo_enviado,
+        "output": output,
+        "sucesso": sucesso
+    })
